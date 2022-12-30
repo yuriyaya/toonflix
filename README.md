@@ -1,8 +1,6 @@
 # toonflix
 
-A new Flutter project.
+Follow lecture Flutter tutorial from Nomadcoders. 
 
-## Getting Started
-
-### Pomodoro App
+## Pomodoro App
 ![PomodoroApp](./doc/img/PomodoroApp.png) 
