@@ -19,13 +19,13 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   late Future<WebtoonDetailModel> webtoonDetail;
-  late Future<List<WebtoonEpisodeModel>> episode;
+  late Future<List<WebtoonEpisodeModel>> episodeList;
 
   @override
   void initState() {
     super.initState();
     webtoonDetail = AppService.getToonById(widget.id);
-    episode = AppService.getLatestEpisodesById(widget.id);
+    episodeList = AppService.getLatestEpisodesById(widget.id);
   }
 
   @override
@@ -44,72 +44,130 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Column(
             children: [
-              Hero(
-                tag: widget.id,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10,
-                        offset: const Offset(10, 10),
-                        color: Colors.black.withOpacity(0.5),
-                      )
-                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10,
+                            offset: const Offset(10, 10),
+                            color: Colors.black.withOpacity(0.5),
+                          )
+                        ],
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      width: 250,
+                      child: Image.network(widget.thumb),
+                    ),
                   ),
-                  clipBehavior: Clip.hardEdge,
-                  width: 250,
-                  child: Image.network(widget.thumb),
-                ),
+                ],
               ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: webtoonDetail,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data!.about,
+                          style: const TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          "${snapshot.data!.genre} (${snapshot.data!.age})",
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Text("...");
+                  }
+                },
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: episodeList,
+                builder: ((context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        for (var episode in snapshot.data!)
+                          Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  bottom: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: Colors.green.shade400,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 5,
+                                      offset: const Offset(3, 3),
+                                      color: Colors.black.withOpacity(0.3),
+                                    )
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        episode.title,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.chevron_right_rounded,
+                                        color: Colors.white,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+              )
             ],
           ),
-          const SizedBox(
-            height: 25,
-          ),
-          FutureBuilder(
-            future: webtoonDetail,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 50,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        snapshot.data!.about,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Text(
-                        "${snapshot.data!.genre} (${snapshot.data!.age})",
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              } else {
-                return const Text("...");
-              }
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
